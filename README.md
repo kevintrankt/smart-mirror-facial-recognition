@@ -105,3 +105,9 @@ Remove the downloaded zip files to free up space.
 cd ~
 rm -rf opencv.zip opencv_contrib.zip
 ```
+
+#### Run Enrollment Script
+The Enrollment Script can be ran from the root folder with the following command.
+```
+python scripts/Enrollment.py
+```
