@@ -95,10 +95,9 @@ class FacialDetection():
                 cv2.rectangle(frame, (x_start, y_start), (x_end, y_end), (0, 0, 255), 2)
                 cv2.putText(frame, text, (x_start, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
 
-        return frame
+                return frame
 
 if __name__ == '__main__':
-
     proto_path      = "resources/deploy.prototxt"
     model_path      = "resources/res10_300x300_ssd_iter_140000.caffemodel"
     embedding_model = "resources/openface.nn4.small2.v1.t7"

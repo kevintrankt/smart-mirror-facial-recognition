@@ -1,5 +1,5 @@
+
 # smart-mirror-facial-recognition
-SJSU Senior Project
 
 ## Getting Started
 
@@ -47,9 +47,11 @@ wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.4.
 unzip opencv.zip
 unzip opencv_contrib.zip
 ```
-#### Install numpy 
+#### Install Python Packages
 ```
 sudo pip3 install numpy
+sudo pip3 install imutils
+sudo pip3 install sklearn
 ```
 #### Build OpenCV 
 ```
@@ -106,8 +108,35 @@ cd ~
 rm -rf opencv.zip opencv_contrib.zip
 ```
 
-#### Run Enrollment Script
-The Enrollment Script can be ran from the root folder with the following command.
+## Classes
+There are several classes that can be ran independently from the app.
+ - Camera
+     - CV2 Camera Stream
+     - Connects to device's camera and return frames
+- Embedding
+    - Processes dataset into embeddings file for model
+- Enrollment
+    - Captures faces and saves as dataset
+- FacialDetection
+    - Detects face given a frame and labels it
+- Gesture
+    - Detects a hand gesture and returns it's label
+- TrainModel
+    - Trains model with Embedding Data
+
+### Testing the Classes
+Each of the classes can be ran from the root folder through. The arguments for the class are defaulted and can be modified in the main function.
 ```
-python scripts/Enrollment.py
+python scripts/class.py
 ```
+
+## Application
+The application is ran to handle the sign in, sign out and sign up of the user.
+It is always running and is looking for an action gesture.
+
+- If the user is not signed in and...
+    - A five is detected the mirror will attempt to detect a face.
+    - A two is detected the mirror will prompt the user to capture 5 pictures
+    - The photo is captured by showing a five
+- If the user is signed in...
+    - The user is logged out by showing a zero
