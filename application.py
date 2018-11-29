@@ -60,7 +60,7 @@ if __name__ == '__main__':
     camera = Camera()
     camera.startVideoStream()
 
-    gesture           = Gesture()
+    gesture           = Gesture(cascade_file)
     keyboard          = Controller()
     embedding         = Embeddings(proto_path, model_path, embedding_model)
     enrollment        = Enrollment(cascade_file)
