@@ -1,51 +1,24 @@
-from imutils.video import VideoStream
-import argparse
 import imutils
-import time
 import cv2
-import os
-
-import logging, sys
+from Camera import Camera
 
 class Enrollment():
-    def __init__(self, cascade_file, RPI3=False, show_video_feed=False, level=logging.CRITICAL):
-        self.RPI3            = RPI3
-        self.show_video_feed = show_video_feed
-
-        logging.basicConfig(stream=sys.stderr, level=level)
-        
+    def __init__(self, cascade_file):
+      
         # Load Cascade Facial Detection
         self.detector = cv2.CascadeClassifier(cascade_file)
-        
-    def startVideoStream(self):
-        logging.info("Starting video stream")
-        if self.RPI3:
-            # User Raspberry Pi3 Camera Module
-            self.video_stream = VideoStream(usePiCamera=True).start()
-        else: 
-            # Use Default Camera
-            self.video_stream = VideoStream(src=0).start()
 
-        # Allow for the Camera to Wake
-        time.sleep(2.0)
-
-    def endVideoStream(self):
-        cv2.destroyAllWindows()
-        self.video_stream.stop()
-
-    def detectFace(self):
+    def detectFace(self, frame):
         """
-        Detects face from video stream. Returns Original Frame if Found, None if not detected
+        Detects face from video stream. Returns Found Status and Resize Frame
         """
-
-        # Extract the Frame from the Video Stream
-        frame = self.video_stream.read()
+        face_detected = True
 
         # Resize the Frame
-        resized_frame = imutils.resize(frame, width=400)
+        frame = imutils.resize(frame, width=400)
         
         # Grayscale the Frame
-        grayscale_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2GRAY)
+        grayscale_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Dectect Face in Grayscaled Frame
         facial_area = self.detector.detectMultiScale(
@@ -55,20 +28,15 @@ class Enrollment():
                         minSize=(30, 30)
                     )
      
-        # No Face Detected, Return From Function
+        # No Face Detected
         if facial_area == ():
-            logging.debug("No face detected")
-            return None
+            face_detected = False
 
         # Redraw Frame with Outlined Facial Area
         for (x, y, w, h) in facial_area:
-            cv2.rectangle(resized_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Show the Output Frame
-        if self.show_video_feed:
-            cv2.imshow("Frame", resized_frame)
-
-        return frame
+        return face_detected, frame
 
     def saveFrame(self, frame, filename):
         return cv2.imwrite(filename, frame)
@@ -77,12 +45,20 @@ class Enrollment():
 if __name__ == '__main__':
     cascade_file = "resources/haarcascade_frontalface_default.xml"
 
-    enrollment = Enrollment(cascade_file=cascade_file, show_video_feed=True, level=logging.DEBUG)
-    enrollment.startVideoStream()
+    enrollment = Enrollment(cascade_file=cascade_file)
+
+    camera = Camera()
+    camera.startVideoStream()
     
     file_count = 0
     while True:
-        frame = enrollment.detectFace()
+        frame = camera.getFrame()
+        detected, drawn_frame = enrollment.detectFace(frame)
+
+        if detected:
+            cv2.imshow("Frame", drawn_frame)
+        else:
+            cv2.imshow("Frame", drawn_frame)
 
         key = cv2.waitKey(1) & 0xFF
         if key == ord("k"):
@@ -91,5 +67,5 @@ if __name__ == '__main__':
         elif key == ord("q"):
             break
 
-    enrollment.endVideoStream()
+    camera.endVideoStream()
 
